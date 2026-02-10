@@ -54,10 +54,6 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
-button:hover {
-  background-color: #110501;
-  color: #e0dbd4;
-}
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
@@ -71,7 +67,6 @@ button:focus-visible {
   width: 100%;
   height: 100%;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
 
