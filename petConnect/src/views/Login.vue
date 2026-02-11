@@ -80,6 +80,7 @@
     padding-right: 2em;
     border-radius: 15em;
     cursor: pointer;
+    font-size: large;
   }
   button:hover {
     background-color: #110501;
@@ -88,6 +89,7 @@
    button:focus,
    button:focus-visible {
         outline: 4px auto -webkit-focus-ring-color;
+        font-size: large;
    }
   .texto{
     color: #110501;

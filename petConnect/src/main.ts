@@ -6,12 +6,14 @@ import Inicio from './views/Inicio.vue'
 import Login from './views/Login.vue'
 import Registrar from './views/Registrar.vue'
 import PaginaUsuario from './views/PaginaUsuario.vue'
+import MisActividades from './views/MisActividades.vue'
 
 const routes = [
   { path: '/', component: Inicio },
   { path: '/login', component: Login },
   { path: '/registrar', component: Registrar },
-  { path: '/paginaUsuario', component: PaginaUsuario}
+  { path: '/paginaUsuario', component: PaginaUsuario},
+  { path: '/misActividades', component: MisActividades}
 ]
 
 const router = createRouter({

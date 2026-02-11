@@ -1,12 +1,11 @@
 <template>
-  <nav v-if="$route.path !== '/paginaUsuario'">
+  <nav v-if="!['/paginaUsuario', '/misActividades'].includes($route.path)">
     <div class="redesSociales">
       <div id="icono1" class="icono"></div>
       <div id="icono2" class="icono"></div>
       <div id="icono3" class="icono"></div>
     </div>
   </nav>
-  
   <router-view></router-view>
 </template>
 

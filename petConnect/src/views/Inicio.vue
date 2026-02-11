@@ -43,6 +43,10 @@ const addTarea = () => {
     width: 18em;
     gap:2em;
   }
+  button:hover {
+    background-color: #110501;
+    color: #e0dbd4;
+  }
   .botonPrimario{
     height: 3em;
     background-color: #eec699;
