@@ -1,9 +1,21 @@
 <script setup>
     import { ref } from 'vue'
-    const password = ref('')
+    import axios from 'axios';
+    import { useRouter } from 'vue-router';
+    const email = ref('');
+    const clave = ref('');
+    const router = useRouter();
     const login = async()=>{
       try{
-        const respuesta = await fetch("")
+        const respuesta = await axios.post("http://localhost:3000/api/login",{
+          email: email.value,
+          clave: clave.value
+        });
+        //se guarda el nombre en el local y se coge el nombre de la base de datos
+        localStorage.setItem("nombreUsuario",respuesta.data.nombre);
+        localStorage.setItem("token",respuesta.data.token);
+        router.push('/paginaUsuario');
+
       }
       catch(errror){
         console.log("Error al conectar con el servidor: ",error)
@@ -17,11 +29,11 @@
       <img src="../assets/logoPet.png" class="logo">
       <div class="huecos">
         <h2 class="texto">Iniciar Sesión</h2>
-        <input class="correo" type="text" placeholder="Email">
-        <input type="password" placeholder="Introduce tu contraseña" class="correo" v-model="password" >
+        <input class="correo" type="text" placeholder="Email" v-model="email">
+        <input type="password" placeholder="Introduce tu contraseña" class="correo" v-model="clave" >
       </div>
       <div class="botones">
-        <button class="botonPrimario" @click="$router.push('/paginaUsuario')">Entrar</button>
+        <button class="botonPrimario" @click="login">Entrar</button>
         <h3 class="botonSecundario" @click="$router.push('/')">Volver</h3>
       </div>
       <div>

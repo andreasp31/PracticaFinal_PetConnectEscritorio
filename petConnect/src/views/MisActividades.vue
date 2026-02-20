@@ -1,26 +1,49 @@
 <script setup>
-    import { ref } from 'vue'
-    const password = ref('')
-    const login = async()=>{
-      try{
-        const respuesta = await fetch("")
+    import { ref, onMounted } from 'vue'
+    import axios from 'axios'
+
+    const mostrarModalAdoptar = ref(false)
+    const abrirModalAdoptar = ()=>{
+      mostrarModalAdoptar.value = true
+    }
+    const cerrarModalAdoptar = ()=>{
+      mostrarModalAdoptar.value = false
+    }
+    const mostrarModalCerrar = ref(false)
+    const abrirModalCerrar = ()=>{
+      mostrarModalCerrar.value = true
+    }
+    const cerrarModalCerrar = ()=>{
+      mostrarModalCerrar.value = false
+    }
+    const nombre = ref("Usuario");
+    onMounted(() =>{
+      const nombreGuardado = localStorage.getItem("nombreUsuario");
+      if(nombreGuardado){
+        nombre.value= nombreGuardado;
+        cargarMisActividades();
       }
-      catch(errror){
-        console.log("Error al conectar con el servidor: ",error)
+    })
+    const cargarMisActividades = async()=>{
+      try{
+        const idUsuario = localStorage.getItem("idUsuario");
+        if (!idUsuario) return;
+        const respuesta = await axios.get(`http://localhost:3000/api/mis-actividades/:usuarioId/${idUsuario}`);
+        actividades.value = respuesta.data;
+      }
+      catch(error){
+        console.log("Error al traer mis actividades: ",error);
       }
     }
-    const actividades = ref([
-      { _id: 1, nombre: 'Paseo por el parque',descripcion: 'Un paseo relajante para tu mascota.' },
-  // Puedes añadir o quitar objetos aquí para ver cómo reacciona el Grid
-    ])
+    const actividades = ref([])
 </script>
 
 <template>
   <div class="contenedor">
     <div class="bloqueArriba">
-      <div class="usuario">
+      <div class="usuario"  @click="abrirModalCerrar()">
         <img src="../assets/huella.png" class="iconoU">
-        <div>Nombre</div>
+        <div>{{nombre}}</div>
       </div>
       <img src="../assets/logoBlanco.png" class="logo">
       <div class="redesSociales2">
@@ -32,7 +55,7 @@
     <div class="bloqueBotones">
       <button class="botonSecundario" @click="$router.push('/paginaUsuario')">Nuevas Actividades</button>
       <button class="botonPrimario2">Mis Actividades</button>
-      <button class="botonTerciario">Adoptar</button>
+      <button class="botonSecundario" @click="abrirModalAdoptar()">Adoptar</button>
     </div>
     <div class="bloqueActividades">
       <div v-for="actividad in actividades" :key="actividad._id" class="tarjeta">
@@ -46,8 +69,32 @@
       </div>
     </div>
   </div>
-</template>
+  <div class="modalAdoptar">
+      <div v-if="mostrarModalAdoptar" class="overlay" @click.self="cerrarModalAdoptar">
+        <div class="modal2">
+          <div class="cabeceraModal">
+            <div @click="cerrarModalAdoptar" class="botonCerrar"></div>
+            <h2 class="texto2">Próximamente!</h2>
+          </div>
+          <div class="descripcion">
+            <p class="texto3">Estamos creando un espacio dedicado a conectar animales de protectoras con familias que busquen un nuevo mejor amigo. Muy pronto podrás conocer sus historias, recibir asesoramiento sobre el proceso y dar el paso para cambiar una vida para siempre.</p>
+            <div class="fotoAdopcion"></div>
+          </div>
+        </div>
+      </div>
+  </div>
+  <div class="modalCerrarSesion">
+      <div v-if="mostrarModalCerrar" class="overlay2" @click.self="cerrarModalCerrar">
+        <div class="modal3">
+            <h2 class="texto5">Mi cuenta</h2>
+          <div class="descripcion">
+            <button class="botonPrimario3" @click="$router.push('/login')">Cerrar Sesión</button>
+          </div>
+        </div>
+      </div>
+  </div>
 
+</template>
 
 /*Para que los estilos solo afecten a esta vista */
 <style scoped>
@@ -59,6 +106,108 @@
     margin: 0em;
     overflow-y: visible;
     align-items: center;
+  }
+  .modal2{
+    background-color: #fcfcfc;
+    border-radius: 2em;
+    width: 40%;
+    height: 40%;
+    display: flex;
+    flex-direction: column;
+  }
+  .modal3{
+    background-color: #fcfcfc;
+    border-radius: 2em;
+    width: 15%;
+    height: 15%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin-top: -43em;
+    margin-left: 2em;
+  }
+  .botonCerrar{
+    width: 2.5em;
+    height: 2.5em;
+    margin-left: 1em;
+    cursor: pointer;
+    background-image: url("../assets/botonCerrar.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  .overlay{
+    position: fixed;
+    top:0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content:center;
+    align-items: center;
+    z-index: 9999;
+  }
+  .overlay2{
+    position: fixed;
+    top:0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.13);
+    display: flex;
+    justify-content:left;
+    align-items: center;
+    z-index: 9999;
+  }
+  .texto5{
+    color: #110501;
+    font-weight: 100;
+    width: 19em;
+    height: 3em;
+    text-align: center;
+    font-weight:500;
+    font-size: x-large;
+  }
+  .texto2{
+    color: #110501;
+    font-weight: 100;
+    width: 19em;
+    text-align: center;
+    font-weight:500;
+    font-size: xx-large
+  }
+  .texto3{
+    color: #110501;
+    font-weight: 100;
+    width: 28em;
+    padding-left: 2em;
+    text-align: left;
+  }
+  .descripcion{
+    display:flex;
+    align-items: center;
+    text-align: center;
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+    margin-top: -2.5em;
+    gap:4em;
+  }
+  .fotoAdopcion{
+    background-image: url("../assets/perroAdopta.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 20em;
+    width: 10em;
+  }
+  .cabeceraModal{
+    align-items: start;
+    display: flex;
+    flex-direction: row;
+    margin-left: 1.5em;
+    margin-right: 1.5em;
+    margin-top: 1em;
   }
   .bloqueActividades{
     display: grid;
@@ -97,6 +246,10 @@
     gap:2em;
     align-items: center;
     margin-left: -5em;
+    cursor: pointer;
+  }
+  .usuario:hover{
+    transform: scale(1.05);
   }
   .iconoU{
     height: 2em;
@@ -152,6 +305,14 @@
     color: #ffffff;
     border-radius: 15em;
     width: 12em;
+    font-size: large;
+  }
+  .botonPrimario3{
+    height: 2.5em;
+    background-color: #110501;
+    color: #ffffff;
+    border-radius: 15em;
+    width: 10em;
     font-size: large;
   }
   .botonSecundario{

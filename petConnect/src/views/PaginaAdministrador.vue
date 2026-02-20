@@ -1,24 +1,25 @@
 <script setup>
-    import { ref, onMounted } from 'vue'
-    import axios from 'axios'
-    const fechaSeleccionada = ref('');
-    const nombre = ref("Usuario");
-    onMounted(() =>{
-      const nombreGuardado = localStorage.getItem("nombreUsuario");
-      if(nombreGuardado){
-        nombre.value= nombreGuardado;
+    import { ref } from 'vue'
+    const password = ref('')
+    const login = async()=>{
+      try{
+        const respuesta = await fetch("")
       }
-      cargarActividades();
-    })
-    const cargarActividades = async () => {
-      try {
-        const respuesta = await axios.get("http://localhost:3000/api/actividades");
-        actividades.value = respuesta.data;
-      } catch (error) {
-        console.error("Error al traer actividades:", error);
+      catch(errror){
+        console.log("Error al conectar con el servidor: ",error)
       }
-    };
-    const actividades = ref([])
+    }
+    const actividades = ref([
+      { _id: 1, nombre: 'Paseo por el parque',descripcion: 'Un paseo relajante para tu mascota.',plazas:10 },
+      { _id: 2, nombre: 'Guardería Canina', descripcion: 'Cuidamos a tu perro todo el día.',plazas:15 },
+      { _id: 3, nombre: 'Entrenamiento', descripcion: 'Mejora el comportamiento de tu peludo.',plazas:10 },
+      { _id: 4, nombre: 'Entrenamiento', descripcion: 'Mejora el comportamiento de tu peludo.',plazas:10 },
+      { _id: 1, nombre: 'Paseo por el parque',descripcion: 'Un paseo relajante para tu mascota.',plazas:10 },
+      { _id: 2, nombre: 'Guardería Canina', descripcion: 'Cuidamos a tu perro todo el día.',plazas:15 },
+      { _id: 3, nombre: 'Entrenamiento', descripcion: 'Mejora el comportamiento de tu peludo.',plazas:10 },
+      { _id: 4, nombre: 'Entrenamiento', descripcion: 'Mejora el comportamiento de tu peludo.',plazas:10 },
+  // Puedes añadir o quitar objetos aquí para ver cómo reacciona el Grid
+    ])
     const mostrarModal = ref(false)
     const actividadSeleccionada = ref(null)
     const abrirModal = (actividad)=>{
@@ -32,52 +33,23 @@
     const cerrarModalAdoptar = ()=>{
       mostrarModalAdoptar.value = false
     }
-    const mostrarModalCerrar = ref(false)
-    const abrirModalCerrar = ()=>{
-      mostrarModalCerrar.value = true
-    }
-    const cerrarModalCerrar = ()=>{
-      mostrarModalCerrar.value = false
-    }
     const horasDispo = ["09:00","11:00","13:00","17:00","19:00"];
     const horaSeleccionada = ref(null);
     const seleccionarHora =(hora)=>{
       horaSeleccionada.value = hora;
     }
     const cerrarModal = ()=>{
-      mostrarModal.value = false;
-      horaSeleccionada.value = null
+      mostrarModal.value = false
+      horaSeleccionada.value = false
     }
-    const inscripcion = async()=>{
-      const idUsuario = localStorage.getItem("idUsuario");
-      console.log("Inscribiendo al usuario:", idUsuario);
-      if (!horaSeleccionada.value) {
-        console.log("Por favor, selecciona una hora");
-        return;
-      }
-      const datos = {
-        actividadId: actividadSeleccionada.value._id,
-        usuarioId: localStorage.getItem("idUsuario"),
-        hora: horaSeleccionada.value
-      };
-
-      try {
-        const res = await axios.post("http://localhost:3000/api/actividades/inscribir", datos);
-        console.log(res.data.message);
-        cerrarModal();
-      } catch (error) {
-        console.error("Error al inscribirse:", error);
-        console.log("No se pudo completar la inscripción");
-      }
-    }
-  </script>
+</script>
 
 <template>
   <div class="contenedor">
     <div class="bloqueArriba">
-      <div class="usuario" @click="abrirModalCerrar()">
+      <div class="usuario">
         <img src="../assets/huella.png" class="iconoU">
-        <div>{{nombre}}</div>
+        <div>Nombre</div>
       </div>
       <img src="../assets/logoBlanco.png" class="logo">
       <div class="redesSociales2">
@@ -96,9 +68,8 @@
         <div class="tarjetaSub">
           <h2 class="texto">{{ actividad.nombre }}</h2>
           <button class="botonPrimario" @click="abrirModal(actividad)">Ver más</button>
-        </div class="actividadInfo">
+        </div>
         <p class="texto">{{ actividad.descripcion }}</p>
-        <p class="texto">Fecha: {{ new Date(actividad.fechaHora).toLocaleDateString() }}</p>
       </div>
     </div>
     <div class="modalActividad">
@@ -110,13 +81,12 @@
           <h2 class="texto4">{{ actividadSeleccionada?.nombre }}</h2>
           <div class="descripcion2">
             <p class="texto5">{{ actividadSeleccionada?.descripcion }}</p>
-            <p class="texto5">Fecha: {{ new Date(actividadSeleccionada?.fechaHora).toLocaleDateString() }}</p>
             <div class="botonesHora">
               <button v-for="hora in horasDispo" :key="hora" :class="['botonHora', { activo: horaSeleccionada === hora }]" @click="seleccionarHora(hora)">{{ hora }}</button>
             </div>
           </div>
           <div class="pieActividad">
-            <button class="botonPrimario2" @click="inscripcion()">Inscribirme</button>
+            <button class="botonPrimario2">Inscribirme</button>
           </div>
         </div>
       </div>
@@ -135,16 +105,6 @@
         </div>
       </div>
     </div>
-    <div class="modalCerrarSesion">
-      <div v-if="mostrarModalCerrar" class="overlay2" @click.self="cerrarModalCerrar">
-        <div class="modal3">
-          <h2 class="texto6">Mi cuenta</h2>
-          <div class="descripcion">
-            <button class="botonPrimario3" @click="$router.push('/login')">Cerrar Sesión</button>
-          </div>
-        </div>
-      </div>
-  </div>
   </div>
 </template>
 
@@ -155,11 +115,6 @@
     display: flex;
     flex-direction: row;
     gap: 2em;
-  }
-  .actividadInfo{
-    display: flex;
-    flex-direction: column;
-    gap: 0.3em;
   }
   .pieActividad{
     display: flex;
@@ -179,37 +134,6 @@
     border-width: 0.1em;
     border-style: solid;
     border-radius: 15em;
-  }
-  .modal3{
-    background-color: #fcfcfc;
-    border-radius: 2em;
-    width: 15%;
-    height: 15%;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    margin-top: -43em;
-    margin-left: 2em;
-  }
-  .botonPrimario3{
-    height: 2.5em;
-    background-color: #110501;
-    color: #ffffff;
-    border-radius: 15em;
-    width: 10em;
-    font-size: large;
-  }
-  .overlay2{
-    position: fixed;
-    top:0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.13);
-    display: flex;
-    justify-content:left;
-    align-items: center;
-    z-index: 9999;
   }
   .botonHora:hover{
     background-color: #110501;
@@ -361,7 +285,6 @@
     gap:2em;
     align-items: center;
     margin-left: -5em;
-    cursor: pointer;
   }
   .iconoU{
     height: 2em;
@@ -463,15 +386,6 @@
     text-align: center;
     font-weight:500;
     font-size: xx-large
-  }
-  .texto6{
-    color: #110501;
-    font-weight: 100;
-    width: 19em;
-    height: 3em;
-    text-align: center;
-    font-weight:500;
-    font-size: x-large;
   }
   .texto4{
     color: #110501;

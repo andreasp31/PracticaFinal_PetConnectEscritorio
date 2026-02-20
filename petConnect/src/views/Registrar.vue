@@ -1,6 +1,51 @@
 <script setup>
     import { ref } from 'vue'
-    const password = ref('')
+    import axios from 'axios';
+    import { useRouter } from 'vue-router';
+    const nombre = ref('');
+    const apellidos = ref('');
+    const email = ref('');
+    const clave = ref('');
+    const clave2 = ref('');
+    const errorMensaje = ref('');
+    const router = useRouter();
+    const registrar = async()=>{
+      errorMensaje.value='';
+      try{
+        const respuesta = await axios.post("http://localhost:3000/api/registro",{
+          nombre: nombre.value,
+          apellidos: apellidos.value,
+          email: email.value,
+          clave: clave.value,
+          clave2: clave2.value
+        });
+        router.push('/login');
+
+      }
+      catch (error) {
+        let mensajeFinal = "Error al registrar";
+
+        if (error.response && error.response.data) {
+            const data = error.response.data;
+
+            // 1. Si usamos el nuevo formato .format() del backend:
+            if (data.detalles) {
+                // Buscamos el primer error que aparezca en el objeto formateado
+                // Zod .format() devuelve algo como { nombre: { _errors: [] } }
+                const primerCampoConError = Object.keys(data.detalles).find(key => key !== '_errors');
+                if (primerCampoConError) {
+                    mensajeFinal = data.detalles[primerCampoConError]._errors[0];
+                }
+            } 
+            // 2. Por si acaso sigue viniendo como mensaje directo
+            else if (data.message) {
+                mensajeFinal = data.message;
+            }
+        }
+
+        errorMensaje.value = mensajeFinal;
+          }
+    }
 </script>
 
 <template>
@@ -10,19 +55,18 @@
       <div class="huecos">
         <h2 class="texto">Registrarse</h2>
         <div class="nombreCompleto">
-          <input class="correo" type="text" placeholder="Nombre">
-          <input class="correo" type="text" placeholder="Apellidos">
+          <input class="correo" type="text" placeholder="Nombre" v-model="nombre">
+          <input class="correo" type="text" placeholder="Apellidos" v-model="apellidos">
         </div>
-        <input class="correo" type="text" placeholder="Email">
-        <input type="password" placeholder="Crea una contraseña" class="correo" >
-        <input type="password" placeholder="Repite la contraseña" class="correo">
+        <input class="correo" type="text" placeholder="Email" v-model="email">
+        <input type="password" placeholder="Crea una contraseña" class="correo" v-model="clave">
+        <input type="password" placeholder="Repite la contraseña" class="correo" v-model="clave2">
       </div>
       <div class="botones">
-        <button class="botonPrimario">Entrar</button>
+        <p v-if="errorMensaje" class="mensajError">{{ errorMensaje }}</p>
+        <button class="botonPrimario" @click="registrar">Registrarse</button>
         <h3 class="botonSecundario" @click="$router.push('/')">Volver</h3>
-      </div>
-      <div>
-        <h3 class="textoEnlace">Te has olvidado de la contraseña?</h3>
+
       </div>
     </div>
     <div class="bloqueDerecho">
@@ -47,6 +91,12 @@
     justify-content: center;
     align-items:center;
     width: 60%;
+  }
+  .mensajError{
+    color: #d32f2f;
+    font-size: 0.9em;
+    text-align: center;
+    min-height: 1.2em;
   }
   .botones{
     display: flex;
@@ -96,6 +146,7 @@
     color: #110501;
     font-weight: 100;
     width: 28em;
+    margin-top: -1.5em;
   }
   .textoEnlace{
     color: #110501;
@@ -124,7 +175,7 @@
     margin-top: 5em;
   }
   .bloqueDerecho{
-    margin-top: -64em;
+    margin-top: -54em;
     width: 60em;
     align-content: end;
     align-self: flex-end;
