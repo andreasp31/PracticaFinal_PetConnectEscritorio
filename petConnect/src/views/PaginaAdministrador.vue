@@ -7,6 +7,7 @@
     const descripcion = ref('');
     const fecha = ref('');
     const plazas = ref('');
+    const horas = ["09:00","11:00","13:00","17:00","19:00"];
     const mostrarModalAdoptar = ref(false)
     const abrirModalAdoptar = ()=>{
       mostrarModalAdoptar.value = true
@@ -22,6 +23,7 @@
       mostrarModalCerrar.value = false
     }
     const mostrarModal = ref(false)
+    const mostrarModal2 = ref(false)
     const actividadSeleccionada = ref(null)
     const abrirModal = (actividad)=>{
       //Cargar datos para que se vea la info al intentar editar
@@ -33,11 +35,31 @@
       // Formatear la fecha
       if (actividad.fecha) {
         fecha.value = new Date(actividad.fecha).toISOString().split('T')[0];
-  }
+      }
       mostrarModal.value = true
+    }
+    const abrirModal2 = (actividad)=>{
+      //Cargar datos para que se vea la info al intentar editar
+      actividadSeleccionada.value = actividad
+      nombreActividad.value = actividad.nombre;
+      descripcion.value = actividad.descripcion;
+      plazas.value = actividad.plazas;
+      
+      // Formatear la fecha
+      if (actividad.fecha) {
+        fecha.value = new Date(actividad.fecha).toISOString().split('T')[0];
+      }
+      mostrarModal2.value = true
     }
     const cerrarModal = ()=>{
       mostrarModal.value = false;
+      nombreActividad.value = '';
+      descripcion.value = '';
+      fecha.value = '';
+      plazas.value = '';
+    }
+    const cerrarModal2 = ()=>{
+      mostrarModal2.value = false;
       nombreActividad.value = '';
       descripcion.value = '';
       fecha.value = '';
@@ -138,6 +160,10 @@
         console.log("Error al eliminar:", error);
       }
     }
+    const personasHora = (hora) =>{
+      if (!actividadSeleccionada.value || !actividadSeleccionada.value.personasApuntadas) return [];
+      return actividadSeleccionada.value.personasApuntadas.filter(p => p.hora === hora);
+    }
 </script>
 
 <template>
@@ -165,6 +191,7 @@
           <h2 class="texto">{{ actividad.nombre }}</h2>
           <div class="editar">
             <div id="icono4" @click="abrirModal(actividad)"></div>
+            <div id="icono5" @click="abrirModal2(actividad)"></div>
           </div>
         </div>
         <p class="texto5">{{ actividad.descripcion }}</p>
@@ -238,7 +265,7 @@
         </div>
       </div>
   </div>
-   <div v-if="mostrarModalConfirmar" class="overlay3">
+  <div v-if="mostrarModalConfirmar" class="overlay3">
       <div class="modalConfirmar">
         <h2 class="texto6">¿Estás seguro?</h2>
         <p class="texto6">Vas a eliminar la actividad. Esta acción no se puede deshacer.</p>
@@ -247,7 +274,36 @@
           <button class="botonCancelar" @click="eliminarActividad">Sí, eliminar</button>
         </div>
       </div>
-    </div>
+  </div>
+  <div class="modalActividad2">
+      <div v-if="mostrarModal2" class="overlay" @click.self="cerrarModal2">
+        <div class="modal5">
+          <div class="cabeceraModal2">
+            <div @click="cerrarModal2" class="botonCerrar2"></div>
+          </div>
+          <h2 class="textoEditar4">{{actividadSeleccionada?.nombre}}</h2>
+          <p class="texto10">Personas inscritas:</p>
+          <div class="inscripcion">
+            <div v-for="hora in horas" :key="hora" class="formulario2">
+              <div class="cabeceraHora2">
+                <p class="texto9">{{ hora }}h</p> 
+                <p class="texto9">({{ personasHora(hora).length }} personas)</p>
+              </div>
+              <ul class="listaPersonas">
+                <li v-for="persona in personasHora(hora)" :key="persona.usuarioEmail" class="texto8">
+                  {{ persona.usuarioEmail }}
+                  <span v-if="persona.estado === 'cancelado_tarde'" class="texto6">   Canceló tarde</span>
+                  <span v-else class="texto6">   Confirmado</span>
+                </li>
+                <li v-if="personasHora(hora).length === 0" class="texto6">
+                  No hay inscritos
+                </li>
+              </ul>
+            </div>
+          </div> 
+        </div>
+      </div>
+  </div>
 </template>
 
 /*Para que los estilos solo afecten a esta vista */
@@ -260,6 +316,37 @@
     margin: 0em;
     overflow-y: visible;
     align-items: center;
+  }
+  .texto10{
+    color: #110501;
+    text-align: center;
+    margin-top: -2em;
+  }
+  .texto8{
+    color: #110501;
+    gap: 4em;
+    display: flex;
+    flex-direction: row;
+  }
+  .listaPersonas{
+    max-height: 5em;
+    overflow: hidden;
+    overflow-y: auto;
+    gap: 1em;
+  }
+  .cabeceraHora{
+    display: flex;
+    flex-direction: row;
+    gap:1em;
+  }
+  .cabeceraHora2{
+    display: flex;
+    flex-direction: row;
+    gap:1em;
+    background-color: #110501;
+    border-radius: 10em;
+    height: 3em;
+
   }
   input[type="date"]{
     background-color: #ffffff;
@@ -287,6 +374,18 @@
     flex-direction: column;
     gap: 1em;
     align-items: center;
+  }
+  .formulario2{
+    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
+    align-items: center;
+  }
+  .inscripcion{
+    max-height: 27em;
+    overflow: hidden;
+    overflow-y: auto;
+    margin: 1em;
   }
   .bloqueFecha{
     display: flex;
@@ -400,6 +499,15 @@
     display: flex;
     flex-direction: column;
   }
+  .modal5{
+    background-color: #fcfcfc;
+    border-radius: 2em;
+    width: 50em;
+    height: 44em;
+    gap:1em;
+    display: flex;
+    flex-direction: column;
+  }
   .cabeceraModal2{
     align-items: start;
     display: flex;
@@ -503,6 +611,14 @@
     text-align: center;
     font-weight:500;
   }
+  .texto9{
+    color: #e0dbd4;
+    font-weight: 100;
+    width: 19em;
+    height: 3em;
+    text-align: center;
+    font-weight:500;
+  }
   .texto7{
     color: #110501;
     font-weight: 100;
@@ -580,7 +696,11 @@
     width: 3em;
     height: 3em;
     align-items: center;
-    justify-content: center
+    justify-content: center;
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    margin-right: 2em;
   }
   .tarjeta{
     display: flex;
@@ -790,6 +910,18 @@
     width: 1em;
     padding: 1em;
     cursor: pointer;
+  }
+  #icono5{
+    background-image: url("../assets/asistencia.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 1em;
+    padding: 1em;
+    cursor: pointer;
+  }
+  #icono5:hover{
+    transform: scale(1.1);
   }
   #icono4:hover{
     transform: scale(1.1);

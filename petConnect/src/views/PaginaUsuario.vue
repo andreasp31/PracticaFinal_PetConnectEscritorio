@@ -70,13 +70,15 @@
     }
     const personaApuntada = (actividad)=>{
       const email = localStorage.getItem("emailUsuario");
-      if(!email || !actividad.personasApuntadas) return false;
-      for (let i = 0; i < actividad.personasApuntadas.length; i++) {
-        if (actividad.personasApuntadas[i].usuarioEmail === email) {
-          return true;
-        }
-      }
-      return false;
+      return actividad.personasApuntadas.some(p => 
+        p.usuarioEmail === email && p.estado === 'inscrito'
+      );
+    }
+    const plazaPerdida = (actividad) => {
+      const email = localStorage.getItem("emailUsuario");        
+        return actividad.personasApuntadas.some(p => 
+          p.usuarioEmail === email && p.estado === 'cancelado_tarde'
+        );
     }
   </script>
 
@@ -104,10 +106,11 @@
         <div class="tarjetaSub">
           <h2 class="texto">{{ actividad.nombre }}</h2>
           <button 
-            :disabled="actividad.plazas <= 0 || personaApuntada(actividad)"
-            :class="['botonPrimario', { 'botonDesactivado': personaApuntada(actividad) },{ 'botonDesactivado': actividad.plazas <= 0 }]" 
+            :disabled="actividad.plazas <= 0 || personaApuntada(actividad) || plazaPerdida(actividad)"
+            :class="['botonPrimario', { 'botonDesactivado': personaApuntada(actividad) },{ 'botonDesactivado': actividad.plazas <= 0 },{ 'botonDesactivado': plazaPerdida(actividad) }]" 
             @click="abrirModal(actividad)">
-            <span v-if="personaApuntada(actividad)">Inscrito</span>
+            <span v-if="plazaPerdida(actividad)">Cancelado</span>
+            <span v-else-if="personaApuntada(actividad)">Inscrito</span>
             <span v-else-if="actividad.plazas <= 0">Agotado</span>
             <span v-else>Ver más</span>
           </button>
