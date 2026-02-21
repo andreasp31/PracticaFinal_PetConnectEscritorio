@@ -7,13 +7,15 @@ import Login from './views/Login.vue'
 import Registrar from './views/Registrar.vue'
 import PaginaUsuario from './views/PaginaUsuario.vue'
 import MisActividades from './views/MisActividades.vue'
+import PaginaAdministrador from './views/PaginaAdministrador.vue'
 
 const routes = [
   { path: '/', component: Inicio },
   { path: '/login', component: Login },
   { path: '/registrar', component: Registrar },
   { path: '/paginaUsuario', component: PaginaUsuario},
-  { path: '/misActividades', component: MisActividades}
+  { path: '/misActividades', component: MisActividades},
+  { path: '/paginaAdministrador', component: PaginaAdministrador}
 ]
 
 const router = createRouter({

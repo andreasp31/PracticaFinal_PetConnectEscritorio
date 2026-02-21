@@ -4,21 +4,46 @@
     import { useRouter } from 'vue-router';
     const email = ref('');
     const clave = ref('');
+    const errorMensaje = ref('')
     const router = useRouter();
     const login = async()=>{
+      errorMensaje.value = ''
       try{
         const respuesta = await axios.post("http://localhost:3000/api/login",{
           email: email.value,
           clave: clave.value
         });
         //se guarda el nombre en el local y se coge el nombre de la base de datos
-        localStorage.setItem("nombreUsuario",respuesta.data.nombre);
+        const { token, usuario } = respuesta.data;
+        localStorage.setItem("nombreUsuario",respuesta.data.usuario.nombre);
         localStorage.setItem("token",respuesta.data.token);
-        router.push('/paginaUsuario');
-
+        localStorage.setItem("roleUsuario", usuario.role);
+        localStorage.setItem("emailUsuario", respuesta.data.usuario.email);
+        if(usuario.role === "admin"){
+          router.push('/paginaAdministrador');
+        }
+        else{
+          router.push('/paginaUsuario');
+        }
       }
-      catch(errror){
-        console.log("Error al conectar con el servidor: ",error)
+      catch(error){
+        let mensajeFinal = "Error al iniciar sesión";
+        if (error.response && error.response.data) {
+          const data = error.response.data
+
+          // detectar que el email es incorrecto
+          if (data.detalles) {
+            const primerCampoConError = Object.keys(data.detalles).find(key => key !== '_errors')
+            if (primerCampoConError) {
+              mensajeFinal = data.detalles[primerCampoConError]._errors[0]
+            }
+          } 
+          // Si el error viene por credenciales incorrectas  
+          else if (data.message) {
+            mensajeFinal = data.message
+          }
+        }
+        errorMensaje.value = mensajeFinal
       }
     }
 </script>
@@ -38,6 +63,7 @@
       </div>
       <div>
         <h3 class="textoEnlace">Te has olvidado de la contraseña?</h3>
+        <h3 class="mensajError">{{ errorMensaje }}</h3>
       </div>
     </div>
     <div class="bloqueDerecho">
@@ -54,6 +80,12 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+  }
+   .mensajError{
+    color: #d32f2f;
+    font-size: 0.9em;
+    text-align: center;
+    min-height: 1.2em;
   }
   .huecos{
     display: flex;

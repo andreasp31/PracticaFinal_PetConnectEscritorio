@@ -41,34 +41,42 @@
     }
     const horasDispo = ["09:00","11:00","13:00","17:00","19:00"];
     const horaSeleccionada = ref(null);
-    const seleccionarHora =(hora)=>{
-      horaSeleccionada.value = hora;
+    const seleccionarHora =(fechaHora)=>{
+      horaSeleccionada.value = fechaHora;
     }
     const cerrarModal = ()=>{
       mostrarModal.value = false;
       horaSeleccionada.value = null
     }
     const inscripcion = async()=>{
-      const idUsuario = localStorage.getItem("idUsuario");
-      console.log("Inscribiendo al usuario:", idUsuario);
-      if (!horaSeleccionada.value) {
-        console.log("Por favor, selecciona una hora");
-        return;
-      }
+      const emailUsuario = localStorage.getItem("emailUsuario");
+      console.log("Inscribiendo al usuario:", emailUsuario);
       const datos = {
         actividadId: actividadSeleccionada.value._id,
-        usuarioId: localStorage.getItem("idUsuario"),
-        hora: horaSeleccionada.value
+        email: emailUsuario,
+        fechaHora: horaSeleccionada.value
       };
 
       try {
         const res = await axios.post("http://localhost:3000/api/actividades/inscribir", datos);
-        console.log(res.data.message);
+        console.log("Inscrito correctamente.");
+        await cargarActividades();
         cerrarModal();
-      } catch (error) {
+      } 
+      catch (error) {
         console.error("Error al inscribirse:", error);
         console.log("No se pudo completar la inscripción");
       }
+    }
+    const personaApuntada = (actividad)=>{
+      const email = localStorage.getItem("emailUsuario");
+      if(!email || !actividad.personasApuntadas) return false;
+      for (let i = 0; i < actividad.personasApuntadas.length; i++) {
+        if (actividad.personasApuntadas[i].usuarioEmail === email) {
+          return true;
+        }
+      }
+      return false;
     }
   </script>
 
@@ -95,7 +103,14 @@
       <div v-for="actividad in actividades" :key="actividad._id" class="tarjeta">
         <div class="tarjetaSub">
           <h2 class="texto">{{ actividad.nombre }}</h2>
-          <button class="botonPrimario" @click="abrirModal(actividad)">Ver más</button>
+          <button 
+            :disabled="actividad.plazas <= 0 || personaApuntada(actividad)"
+            :class="['botonPrimario', { 'botonDesactivado': personaApuntada(actividad) },{ 'botonDesactivado': actividad.plazas <= 0 }]" 
+            @click="abrirModal(actividad)">
+            <span v-if="personaApuntada(actividad)">Inscrito</span>
+            <span v-else-if="actividad.plazas <= 0">Agotado</span>
+            <span v-else>Ver más</span>
+          </button>
         </div class="actividadInfo">
         <p class="texto">{{ actividad.descripcion }}</p>
         <p class="texto">Fecha: {{ new Date(actividad.fechaHora).toLocaleDateString() }}</p>
@@ -155,6 +170,13 @@
     display: flex;
     flex-direction: row;
     gap: 2em;
+  }
+  .botonDesactivado{
+    cursor:none;
+    color: #0f0f0f;
+    background-color: #ffffff !important;
+    transform: none !important;
+    border: 1px solid #0f0f0f
   }
   .actividadInfo{
     display: flex;
@@ -350,6 +372,7 @@
     border-radius: 2em;
     padding: 1em;
     max-width: 30em;
+    max-height: 14em;
   }
   .tarjetaSub{
     display: flex;
