@@ -56,7 +56,6 @@
         email: emailUsuario,
         fechaHora: horaSeleccionada.value
       };
-
       try {
         const res = await axios.post("http://localhost:3000/api/actividades/inscribir", datos);
         console.log("Inscrito correctamente.");
