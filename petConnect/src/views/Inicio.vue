@@ -20,14 +20,7 @@
 <script setup>
 import { ref } from 'vue'
 const nuevaTarea = ref('')
-const tareas = ref(['Analizar requisitos', 'Diseñar DB en Mongo'])
 
-const addTarea = () => {
-  if(nuevaTarea.value) {
-    tareas.value.push(nuevaTarea.value)
-    nuevaTarea.value = ''
-  }
-}
 </script>
 
 <style>

@@ -3,6 +3,7 @@
     import axios from 'axios'
     const fechaSeleccionada = ref('');
     const nombre = ref("Usuario");
+    //Para coger el nombre del usuario y para enseñarlo en la cabecera
     onMounted(() =>{
       const nombreGuardado = localStorage.getItem("nombreUsuario");
       if(nombreGuardado){
@@ -10,6 +11,7 @@
       }
       cargarActividades();
     })
+    //Enseñar las actividades 
     const cargarActividades = async () => {
       try {
         const respuesta = await axios.get("http://localhost:3000/api/actividades");
@@ -18,6 +20,7 @@
         console.error("Error al traer actividades:", error);
       }
     };
+    //Modales
     const actividades = ref([])
     const mostrarModal = ref(false)
     const actividadSeleccionada = ref(null)
@@ -39,6 +42,7 @@
     const cerrarModalCerrar = ()=>{
       mostrarModalCerrar.value = false
     }
+    //Horas que van a tener las actividades
     const horasDispo = ["09:00","11:00","13:00","17:00","19:00"];
     const horaSeleccionada = ref(null);
     const seleccionarHora =(fechaHora)=>{
@@ -48,6 +52,7 @@
       mostrarModal.value = false;
       horaSeleccionada.value = null
     }
+    //función para apuntarse a una actividad selecionando y añadir a la persona a la lista de personas apuntadas
     const inscripcion = async()=>{
       const emailUsuario = localStorage.getItem("emailUsuario");
       console.log("Inscribiendo al usuario:", emailUsuario);
@@ -59,6 +64,7 @@
       try {
         const res = await axios.post("http://localhost:3000/api/actividades/inscribir", datos);
         console.log("Inscrito correctamente.");
+        //Actualizar las actividades para que actualice el botón
         await cargarActividades();
         cerrarModal();
       } 
@@ -67,12 +73,14 @@
         console.log("No se pudo completar la inscripción");
       }
     }
+    //si está inscrito nos va a dar un estilo de botón
     const personaApuntada = (actividad)=>{
       const email = localStorage.getItem("emailUsuario");
       return actividad.personasApuntadas.some(p => 
         p.usuarioEmail === email && p.estado === 'inscrito'
       );
     }
+    //si está cancelado nos va a dar un estilo de botón enseñando que se pierde plaza
     const plazaPerdida = (actividad) => {
       const email = localStorage.getItem("emailUsuario");        
         return actividad.personasApuntadas.some(p => 
@@ -104,6 +112,7 @@
       <div v-for="actividad in actividades" :key="actividad._id" class="tarjeta">
         <div class="tarjetaSub">
           <h2 class="texto">{{ actividad.nombre }}</h2>
+          /*Según el estado cambia el estilo del boton y quita la posibilidad de editar si está agotado o si pierdes la plaza*/
           <button 
             :disabled="actividad.plazas <= 0 || personaApuntada(actividad) || plazaPerdida(actividad)"
             :class="['botonPrimario', { 'botonDesactivado': personaApuntada(actividad) },{ 'botonDesactivado': actividad.plazas <= 0 },{ 'botonDesactivado': plazaPerdida(actividad) }]" 

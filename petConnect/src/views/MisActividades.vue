@@ -3,11 +3,13 @@
     import axios from 'axios'
     import { useRouter } from 'vue-router'
     const router = useRouter()
+    //Horas disponibles de cada actividad
     const horasDispo = ["09:00","11:00","13:00","17:00","19:00"];
     const horaSeleccionada = ref('');
     const seleccionarHora =(fechaHora)=>{
       horaSeleccionada.value = fechaHora;
     }
+    //modales
     const mostrarModalAdoptar = ref(false)
     const abrirModalAdoptar = ()=>{
       mostrarModalAdoptar.value = true
@@ -40,6 +42,7 @@
       mostrarModalConfirmar.value = false;
     };
     const nombre = ref("Usuario");
+    //coger el nombre para seguir enseñando arriba en la cabecera
     onMounted(() =>{
       const nombreGuardado = localStorage.getItem("nombreUsuario");
       if(nombreGuardado){
@@ -47,6 +50,7 @@
         cargarMisActividades();
       }
     })
+    //listar las actividades en las que estan inscritas
     const cargarMisActividades = async()=>{
       try{
         const email = localStorage.getItem("emailUsuario");
@@ -58,6 +62,7 @@
       }
     }
     const actividades = ref([]);
+    //buscar la hora a la que se ha apuntado ese usuario en una actividad 
     const cargarFecha = (actividad) => {
       if (!actividad || !actividad.personasApuntadas) return "...";
 
@@ -70,6 +75,7 @@
       }
       return "Sin hora";
     }
+    //elimina al usuario de la lista de apuntados de esa actividad
     const cancelarReserva = async()=>{
       const emailUsuario = localStorage.getItem("emailUsuario");
       const actividadId = actividadSeleccionada.value._id;

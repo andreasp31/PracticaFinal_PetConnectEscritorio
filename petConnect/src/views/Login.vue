@@ -6,6 +6,7 @@
     const clave = ref('');
     const errorMensaje = ref('')
     const router = useRouter();
+    //función de login
     const login = async()=>{
       errorMensaje.value = ''
       try{
@@ -47,7 +48,7 @@
       }
     }
 </script>
-
+/*Vista */
 <template>
   <div class="contenedor">
     <div class="bloqueIzquierdo">

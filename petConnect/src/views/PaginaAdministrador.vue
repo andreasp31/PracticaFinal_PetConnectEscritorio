@@ -8,6 +8,7 @@
     const fecha = ref('');
     const plazas = ref('');
     const horas = ["09:00","11:00","13:00","17:00","19:00"];
+    //modal
     const mostrarModalAdoptar = ref(false)
     const abrirModalAdoptar = ()=>{
       mostrarModalAdoptar.value = true
@@ -83,6 +84,7 @@
     const cerrarConfirmar = () => {
       mostrarModalConfirmar.value = false;
     };
+    //listar actividades
     const cargarActividades = async () => {
       try {
         const respuesta = await axios.get("http://localhost:3000/api/actividades");
@@ -100,6 +102,7 @@
       cargarActividades();
     })
     const actividades = ref([]);
+    //guardar una nueva actividad a través de un formulario
     const registrar = async () => {
       try {
         const nuevaActividad = {
@@ -121,6 +124,7 @@
         console.error("Error al crear la actividad:", error);
       }
     }
+    //modificar una actividad cambiando los campos del mismo formulario anterior
     const actualizar = async()=>{
       try{
         const id = actividadSeleccionada.value._id;
@@ -143,6 +147,7 @@
         console.log("Error al guardar la actividad", error);
       }
     }
+    //seleccionar una actividad y se elimina de la lista de actividades
     const eliminarActividad = async()=>{
       const id = actividadSeleccionada.value._id;
       const actividadId = actividadSeleccionada.value._id;
@@ -160,6 +165,7 @@
         console.log("Error al eliminar:", error);
       }
     }
+    //buscar la hora a la que está apuntada una persona a una actividad para controlar la asistencia
     const personasHora = (hora) =>{
       if (!actividadSeleccionada.value || !actividadSeleccionada.value.personasApuntadas) return [];
       return actividadSeleccionada.value.personasApuntadas.filter(p => p.hora === hora);
