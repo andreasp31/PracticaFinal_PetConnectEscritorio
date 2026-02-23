@@ -23,5 +23,5 @@ npm install
 npm run dev
 ```
 ## Caso de Uso: Usuario y Administrador
-
+![CasoUso](./casoUso.png)
 
