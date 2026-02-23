@@ -381,9 +381,9 @@
     border-width: 0.1em;
     border-style: solid;
     border-radius: 2em;
-    padding: 1em;
+    padding: 2em;
     max-width: 30em;
-    max-height: 14em;
+    min-height: 14em;
   }
   .tarjetaSub{
     display: flex;
@@ -442,7 +442,7 @@
     background-color: #eec699;
     color: #110501;
     border-radius: 15em;
-    width: 10em;
+    width: 22em;
     font-size: medium;
   }
   .botonPrimario2{

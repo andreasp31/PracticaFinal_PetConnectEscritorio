@@ -23,6 +23,13 @@
     const cerrarModalCerrar = ()=>{
       mostrarModalCerrar.value = false
     }
+    const mostrarModalEditar = ref(false)
+    const abrirModalEditar = ()=>{
+      mostrarModalEditar.value = true
+    }
+    const cerrarModalEditar = ()=>{
+      mostrarModalEditar.value = false
+    }
     const mostrarModal = ref(false)
     const mostrarModal2 = ref(false)
     const actividadSeleccionada = ref(null)
@@ -38,6 +45,26 @@
         fecha.value = new Date(actividad.fecha).toISOString().split('T')[0];
       }
       mostrarModal.value = true
+    }
+    const abrirModalE = (actividad)=>{
+      //Cargar datos para que se vea la info al intentar editar
+      actividadSeleccionada.value = actividad
+      nombreActividad.value = actividad.nombre;
+      descripcion.value = actividad.descripcion;
+      plazas.value = actividad.plazas;
+      
+      // Formatear la fecha
+      if (actividad.fecha) {
+        fecha.value = new Date(actividad.fecha).toISOString().split('T')[0];
+      }
+      mostrarModalEditar.value = true
+    }
+    const cerrarModalE = ()=>{
+      mostrarModal.value = false;
+      nombreActividad.value = '';
+      descripcion.value = '';
+      fecha.value = '';
+      plazas.value = '';
     }
     const abrirModal2 = (actividad)=>{
       //Cargar datos para que se vea la info al intentar editar
@@ -83,6 +110,7 @@
     };
     const cerrarConfirmar = () => {
       mostrarModalConfirmar.value = false;
+      mostrarModalEditar.value=false;
     };
     //listar actividades
     const cargarActividades = async () => {
@@ -128,7 +156,7 @@
     const actualizar = async()=>{
       try{
         const id = actividadSeleccionada.value._id;
-        cerrarModalCerrar();
+        cerrarModalEditar();
         const respuesta = await axios.put(`http://localhost:3000/api/actividades/actualizar/${id}`,{
           nombre: nombreActividad.value,
           descripcion: descripcion.value,
@@ -196,7 +224,7 @@
         <div class="tarjetaSub">
           <h2 class="texto">{{ actividad.nombre }}</h2>
           <div class="editar">
-            <div id="icono4" @click="abrirModal(actividad)"></div>
+            <div id="icono4" @click="abrirModalE(actividad)"></div>
             <div id="icono5" @click="abrirModal2(actividad)"></div>
           </div>
         </div>
@@ -251,10 +279,10 @@
       </div>
   </div>
   <div class="modalActividad">
-      <div v-if="mostrarModal" class="overlay" @click.self="cerrarModal">
+      <div v-if="mostrarModalEditar" class="overlay" @click.self="cerrarModalE">
         <div class="modal">
           <div class="cabeceraModal2">
-            <div @click="cerrarModal" class="botonCerrar2"></div>
+            <div @click="cerrarModalEditar" class="botonCerrar2"></div>
             <button class="botonCancelar" @click="abrirConfirmar">Eliminar Evento</button>
           </div>
           <h2 class="textoEditar4">{{ actividadSeleccionada?.nombre }}</h2>
@@ -607,7 +635,7 @@
     height: 3em;
     text-align: left;
     font-weight:500;
-    font-size: large;
+    font-size: large;padding-left: 0.5em;
   }
   .texto6{
     color: #110501;
@@ -858,6 +886,7 @@
     font-weight: 100;
     width: 18em;
     text-align: left;
+    padding-left: 0.5em;
   }
   .textoFecha{
     color: #110501;
