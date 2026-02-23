@@ -9,6 +9,9 @@ Aplicación con panel administrativo para la gestión interna del refugio y pane
 * Creación de nuevos usuario a través de formulario y cerrar la sesión dentro de la applicación.
 * Interacción de los Usuarios: inscribirse a eventos, editar la hora y la posibilidad de cancelación.
 
+## Funcionamiento
+Vídeos explicativos adjuntados del funcionamiento de la aplicación tanto por parte del usuario, como por parte del administrador.
+
 ## Tecnologías
 * Framework: Vue 3
 * Shell: Electron 
